@@ -155,6 +155,7 @@
             this.btnRCancel.TabIndex = 7;
             this.btnRCancel.Text = "Cancel";
             this.btnRCancel.UseVisualStyleBackColor = false;
+            this.btnRCancel.Click += new System.EventHandler(this.btnRCancel_Click);
             // 
             // btnRRegister
             // 
@@ -261,6 +262,7 @@
             this.chboxLShowPassword.TabIndex = 21;
             this.chboxLShowPassword.Text = "Show Password";
             this.chboxLShowPassword.UseVisualStyleBackColor = true;
+            this.chboxLShowPassword.CheckedChanged += new System.EventHandler(this.chboxLShowPassword_CheckedChanged);
             // 
             // txtLPassword
             // 
@@ -290,6 +292,7 @@
             this.btnLCancel.TabIndex = 18;
             this.btnLCancel.Text = "Cancel";
             this.btnLCancel.UseVisualStyleBackColor = false;
+            this.btnLCancel.Click += new System.EventHandler(this.btnLCancel_Click);
             // 
             // btnLLogin
             // 
@@ -303,6 +306,7 @@
             this.btnLLogin.TabIndex = 17;
             this.btnLLogin.Text = "Login";
             this.btnLLogin.UseVisualStyleBackColor = false;
+            this.btnLLogin.Click += new System.EventHandler(this.btnLLogin_Click);
             // 
             // lLPassword
             // 
