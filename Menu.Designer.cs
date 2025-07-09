@@ -54,6 +54,7 @@
             this.lLDetails = new System.Windows.Forms.Label();
             this.lLLogin = new System.Windows.Forms.Label();
             this.tCreateReport = new System.Windows.Forms.TabPage();
+            this.label1 = new System.Windows.Forms.Label();
             this.lCRDetails = new System.Windows.Forms.Label();
             this.lCRCreateReport = new System.Windows.Forms.Label();
             this.tMenu.SuspendLayout();
@@ -73,7 +74,7 @@
             this.tMenu.SelectedIndex = 0;
             this.tMenu.Size = new System.Drawing.Size(797, 448);
             this.tMenu.TabIndex = 0;
-            this.tMenu.Click += new System.EventHandler(this.tMenu_Click);
+           
             // 
             // tRegister
             // 
@@ -103,7 +104,7 @@
             // 
             this.chboxRShowPassword.AccessibleName = "chboxRShowPassword";
             this.chboxRShowPassword.AutoSize = true;
-            this.chboxRShowPassword.Location = new System.Drawing.Point(413, 209);
+            this.chboxRShowPassword.Location = new System.Drawing.Point(425, 209);
             this.chboxRShowPassword.Name = "chboxRShowPassword";
             this.chboxRShowPassword.Size = new System.Drawing.Size(148, 24);
             this.chboxRShowPassword.TabIndex = 12;
@@ -114,7 +115,7 @@
             // txtRPassword
             // 
             this.txtRPassword.AccessibleName = "txtRPassword";
-            this.txtRPassword.Location = new System.Drawing.Point(176, 207);
+            this.txtRPassword.Location = new System.Drawing.Point(188, 207);
             this.txtRPassword.Name = "txtRPassword";
             this.txtRPassword.Size = new System.Drawing.Size(216, 26);
             this.txtRPassword.TabIndex = 11;
@@ -123,7 +124,7 @@
             // txtRUsername
             // 
             this.txtRUsername.AccessibleName = "txtRUsername";
-            this.txtRUsername.Location = new System.Drawing.Point(176, 172);
+            this.txtRUsername.Location = new System.Drawing.Point(188, 172);
             this.txtRUsername.Name = "txtRUsername";
             this.txtRUsername.Size = new System.Drawing.Size(216, 26);
             this.txtRUsername.TabIndex = 10;
@@ -131,7 +132,7 @@
             // txtRSurname
             // 
             this.txtRSurname.AccessibleName = "txtRSurname";
-            this.txtRSurname.Location = new System.Drawing.Point(176, 135);
+            this.txtRSurname.Location = new System.Drawing.Point(188, 135);
             this.txtRSurname.Name = "txtRSurname";
             this.txtRSurname.Size = new System.Drawing.Size(216, 26);
             this.txtRSurname.TabIndex = 9;
@@ -139,7 +140,7 @@
             // txtRName
             // 
             this.txtRName.AccessibleName = "txtRName";
-            this.txtRName.Location = new System.Drawing.Point(176, 99);
+            this.txtRName.Location = new System.Drawing.Point(188, 99);
             this.txtRName.Name = "txtRName";
             this.txtRName.Size = new System.Drawing.Size(216, 26);
             this.txtRName.TabIndex = 8;
@@ -175,7 +176,7 @@
             // 
             this.lRPassword.AccessibleName = "lRPassword";
             this.lRPassword.AutoSize = true;
-            this.lRPassword.Location = new System.Drawing.Point(55, 213);
+            this.lRPassword.Location = new System.Drawing.Point(67, 213);
             this.lRPassword.Name = "lRPassword";
             this.lRPassword.Size = new System.Drawing.Size(82, 20);
             this.lRPassword.TabIndex = 5;
@@ -185,7 +186,7 @@
             // 
             this.lRUsername.AccessibleName = "lRUsername";
             this.lRUsername.AutoSize = true;
-            this.lRUsername.Location = new System.Drawing.Point(55, 172);
+            this.lRUsername.Location = new System.Drawing.Point(67, 172);
             this.lRUsername.Name = "lRUsername";
             this.lRUsername.Size = new System.Drawing.Size(87, 20);
             this.lRUsername.TabIndex = 4;
@@ -195,7 +196,7 @@
             // 
             this.lRSurname.AccessibleName = "lRSurname";
             this.lRSurname.AutoSize = true;
-            this.lRSurname.Location = new System.Drawing.Point(55, 135);
+            this.lRSurname.Location = new System.Drawing.Point(67, 135);
             this.lRSurname.Name = "lRSurname";
             this.lRSurname.Size = new System.Drawing.Size(78, 20);
             this.lRSurname.TabIndex = 3;
@@ -205,7 +206,7 @@
             // 
             this.lRName.AccessibleName = "lRName";
             this.lRName.AutoSize = true;
-            this.lRName.Location = new System.Drawing.Point(55, 99);
+            this.lRName.Location = new System.Drawing.Point(67, 99);
             this.lRName.Name = "lRName";
             this.lRName.Size = new System.Drawing.Size(55, 20);
             this.lRName.TabIndex = 2;
@@ -352,6 +353,7 @@
             // tCreateReport
             // 
             this.tCreateReport.AccessibleName = "tCreateReport";
+            this.tCreateReport.Controls.Add(this.label1);
             this.tCreateReport.Controls.Add(this.lCRDetails);
             this.tCreateReport.Controls.Add(this.lCRCreateReport);
             this.tCreateReport.Location = new System.Drawing.Point(4, 29);
@@ -361,6 +363,15 @@
             this.tCreateReport.TabIndex = 2;
             this.tCreateReport.Text = "Create A Report ";
             this.tCreateReport.UseVisualStyleBackColor = true;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(73, 86);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(38, 20);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Title";
             // 
             // lCRDetails
             // 
@@ -432,6 +443,7 @@
         private System.Windows.Forms.TabPage tCreateReport;
         private System.Windows.Forms.Label lCRCreateReport;
         private System.Windows.Forms.Label lCRDetails;
+        private System.Windows.Forms.Label label1;
     }
 }
 

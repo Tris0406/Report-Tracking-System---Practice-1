@@ -18,35 +18,36 @@ namespace Report_Tracking_System___Practice_1
     public partial class Menu : Form
     {
         public bool bLoggedin = false;
-        public string sConnectionString = @"Server=localhost;Database=Report_Tracker_System_Practice_1;Trusted_Connection=True;";
-        // creates connection to db
         private bool tabsInitiallyDisabled = false;
-        // disables tabs once
+        private string sConnectionString = @"Server=localhost;Database=Report_Tracker_System_Practice_1;Trusted_Connection=True;";
+
+        private AddToDB db;
+        private ValidateInputs validator;
 
         public Menu()
         {
             InitializeComponent();
-            this.Load += tMenu_Click;
+            db = new AddToDB(sConnectionString);
+            validator = new ValidateInputs();
+
+            this.Load += Menu_Load;
+
         }
 
-        private void tMenu_Click(object sender, EventArgs e)
+        private void Menu_Load(object sender, EventArgs e)
         {
-
-            // Disable tabs except Login and Register only once
-            if (!tabsInitiallyDisabled)
+            // Disable all tabs except Login and Register
+            foreach (TabPage tab in tMenu.TabPages)
             {
-                foreach (TabPage tab in tMenu.TabPages)
-                {
-                    if (tab != tLogin && tab != tRegister)
-                        tab.Enabled = false;
-                }
-                tabsInitiallyDisabled = true;
+                if (tab != tLogin && tab != tRegister)
+                    tab.Enabled = false;
             }
 
-            // Attach the tab selecting event once
-            tMenu.Selecting -= tMenu_Selecting; // Remove if already attached (to avoid multiple attaches)
+            // Attach tab selection validation once
             tMenu.Selecting += tMenu_Selecting;
         }
+
+       
         private void tMenu_Selecting(object sender, TabControlCancelEventArgs e)
         {
             if (!bLoggedin && e.TabPage != tLogin && e.TabPage != tRegister)
@@ -55,8 +56,7 @@ namespace Report_Tracking_System___Practice_1
                 MessageBox.Show("Please log in first.");
             }
         }
-        // requires the user to login before accessing other tabs
-                
+
         private void EnableAllTabs()
         {
             foreach (TabPage tab in tMenu.TabPages)
@@ -64,155 +64,43 @@ namespace Report_Tracking_System___Practice_1
                 tab.Enabled = true;
             }
         }
-        // enables all the tabs after login
 
-        // *** RESGISTER TAB ***
+        // === REGISTER TAB ===
         private void btnRRegister_Click(object sender, EventArgs e)
         {
-            string sName = txtRName.Text.Trim();
-            string sSurname = txtRSurname.Text.Trim();
-            string sUsername = txtRUsername.Text.Trim();
-            string sPassword = txtRPassword.Text.Trim();
-            // gets user inputs
+            string name = txtRName.Text.Trim();
+            string surname = txtRSurname.Text.Trim();
+            string username = txtRUsername.Text.Trim();
+            string password = txtRPassword.Text.Trim();
 
-
-            if (!ValidateRInputs(sName, sSurname, sUsername, sPassword))
+            if (!validator.ValidateRegistrationInputs(name, surname, username, password))
                 return;
 
-            string sHashedPassword = HashPassword(sPassword);
-            string newUserID = GenerateNextUserID();
+            if (db.UsernameExists(username))
+            {
+                MessageBox.Show("Username already exists. Please choose another one.");
+                txtRUsername.Clear();
+                return;
+            }
 
-            SaveUserToDatabase(newUserID, sName, sSurname, sUsername, sHashedPassword);
+            string hashedPassword = db.HashPassword(password);
+
+            bool saved = db.SaveUser(name, surname, username, hashedPassword);
+            if (saved)
+            {
+                MessageBox.Show("User saved successfully!");
+                RClear_Fields();
+            }
+            else
+            {
+                MessageBox.Show("Failed to save user.");
+            }
         }
-
-        private bool ValidateRInputs(string sName, string sSurname, string sUsername, string sPassword)
-        {
-            int maxLength = 25;
-
-            if (string.IsNullOrWhiteSpace(sName) || sName.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Name (max 25 characters).");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(sSurname) || sSurname.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Surname (max 25 characters).");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(sUsername) || sUsername.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Username (max 25 characters).");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(sPassword) || sPassword.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Password (max 25 characters).");
-                return false;
-            }
-
-            bool hasNumber = sPassword.Any(char.IsDigit);
-            bool hasSpecialChar = sPassword.Any(ch => !char.IsLetterOrDigit(ch));
-
-            if (!hasNumber || !hasSpecialChar)
-            {
-                MessageBox.Show("Password must contain at least one number and one special character.");
-                return false;
-            }
-
-            return true;
-        }
-        // validates the inputs 
 
         private void chboxRShowPassword_CheckedChanged(object sender, EventArgs e)
         {
             txtRPassword.UseSystemPasswordChar = !chboxRShowPassword.Checked;
         }
-        // shows the pw when chbox is clicked
-
-        private string GenerateNextUserID()
-        {
-            string nextId = "RPT001";
-
-            using (SqlConnection con = new SqlConnection(sConnectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT MAX(UserID) FROM Users WHERE UserID LIKE 'RPT%'", con))
-            {
-                con.Open();
-                var result = cmd.ExecuteScalar();
-                if (result != DBNull.Value && result != null)
-                {
-                    string lastId = (string)result;
-                    int number = int.Parse(lastId.Substring(3)) + 1;
-                    nextId = "RPT" + number.ToString("D3");
-                }
-            }
-
-            return nextId;
-        }
-        // auto generate the report id 
-
-        private void SaveUserToDatabase(string userID, string sName, string sSurname, string sUsername, string sHashedPassword)
-        {
-            using (SqlConnection con = new SqlConnection(sConnectionString))
-            {
-                try
-                {
-                    con.Open();
-
-                    using (SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Username = @Username", con))
-                    {
-                        checkCmd.Parameters.AddWithValue("@Username", sUsername);
-                        int userCount = (int)checkCmd.ExecuteScalar();
-                        if (userCount > 0)
-                        {
-                            MessageBox.Show("Username already exists. Please choose another one.");
-                            txtRUsername.Clear();
-                            return;
-                        }
-                    }
-
-                    using (SqlCommand insertCmd = new SqlCommand(
-                        "INSERT INTO Users (UserID, Name, Surname, Username, Password) VALUES (@UserID, @Name, @Surname, @Username, @Password)", con))
-                    {
-                        insertCmd.Parameters.AddWithValue("@UserID", userID);
-                        insertCmd.Parameters.AddWithValue("@Name", sName);
-                        insertCmd.Parameters.AddWithValue("@Surname", sSurname);
-                        insertCmd.Parameters.AddWithValue("@Username", sUsername);
-                        insertCmd.Parameters.AddWithValue("@Password", sHashedPassword);
-
-                        int rowsAffected = insertCmd.ExecuteNonQuery();
-
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("User saved successfully!");
-                            RClear_Fields();
-                            
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to save user.");
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message);
-                }
-            }
-        }
-        // saves users details to the db
-        private string HashPassword(string password)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(password);
-                byte[] hashBytes = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hashBytes);
-            }
-        }
-        // hashes the pw
 
         private void RClear_Fields()
         {
@@ -222,109 +110,64 @@ namespace Report_Tracking_System___Practice_1
             txtRPassword.Clear();
             chboxRShowPassword.Checked = false;
         }
-        // clears the txt
+
         private void btnRCancel_Click(object sender, EventArgs e)
         {
             RClear_Fields();
         }
-        // clears the txt
 
-        // *** LOGIN TAB ***
+        // === LOGIN TAB ===
         private void btnLLogin_Click(object sender, EventArgs e)
         {
-            string sUsername = txtLUsername.Text.Trim();
-            string sPassword = txtLPassword.Text.Trim();
+            string username = txtLUsername.Text.Trim();
+            string password = txtLPassword.Text.Trim();
 
-            if (!ValidateLInputs(sUsername, sPassword))
+            if (!validator.ValidateLoginInputs(username, password))
                 return;
 
-            string hashedPassword = HashPassword(sPassword);
+            string hashedPassword = db.HashPassword(password);
+            string storedPassword = db.GetStoredHashedPassword(username);
 
-            using (SqlConnection con = new SqlConnection(sConnectionString))
+            if (storedPassword == null)
             {
-                try
-                {
-                    con.Open();
+                MessageBox.Show("Username not found. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-                    // Step 1: Check if username exists
-                    string checkUserQuery = "SELECT Password FROM Users WHERE Username = @Username";
-                    using (SqlCommand cmd = new SqlCommand(checkUserQuery, con))
-                    {
-                        cmd.Parameters.AddWithValue("@Username", sUsername);
-                        object result = cmd.ExecuteScalar();
-
-                        if (result == null)
-                        {
-                            MessageBox.Show("Username not found. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                            return;
-                        }
-
-                        string storedHashedPassword = result.ToString().Trim();
-
-                        if (storedHashedPassword == hashedPassword)
-                        {
-                            MessageBox.Show("Login successful!", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            bLoggedin = true;
-                            EnableAllTabs();
-
-                            // Enable all tabs
-                            foreach (TabPage tab in tMenu.TabPages)
-                            {
-                                tab.Enabled = true;
-                            }
-
-                            LClear_Fields();
-                        }
-
-                        else
-                        {
-                            MessageBox.Show("Incorrect password. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Login failed: " + ex.Message);
-                }
+            if (hashedPassword == storedPassword)
+            {
+                MessageBox.Show("Login successful!", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bLoggedin = true;
+                EnableAllTabs();
+                LClear_Fields();
+            }
+            else
+            {
+                MessageBox.Show("Incorrect password. Please try again.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-        // allows the user to login
 
         private void chboxLShowPassword_CheckedChanged(object sender, EventArgs e)
         {
             txtLPassword.UseSystemPasswordChar = !chboxLShowPassword.Checked;
         }
-        // shows the pw
-        private bool ValidateLInputs(string sUsername, string sPassword)
-        {
-            int maxLength = 25;
-            if (string.IsNullOrWhiteSpace(sUsername) || sUsername.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Username (max 25 characters).");
-                return false;
-            }
 
-            if (string.IsNullOrWhiteSpace(sPassword) || sPassword.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Password (max 25 characters).");
-                return false;
-            }
-
-           
-            return true;
-        }
-        // validates the inputs
         private void btnLCancel_Click(object sender, EventArgs e)
         {
             LClear_Fields();
         }
+
         private void LClear_Fields()
         {
             txtLUsername.Clear();
             txtLPassword.Clear();
             chboxLShowPassword.Checked = false;
         }
-        // clears the txt
+
+        
+        private string GenerateReportID()
+        {
+            return db.GenerateRepoprtID(); 
+        }
     }
 }
