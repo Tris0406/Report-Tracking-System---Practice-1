@@ -11,38 +11,23 @@ namespace Report_Tracking_System___Practice_1
     {
         public bool ValidateRegistrationInputs(string name, string surname, string username, string password)
         {
-            int maxLength = 25;
-
-            if (string.IsNullOrWhiteSpace(name) || name.Length > maxLength)
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(surname) ||
+                string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Please enter your Name (max 25 characters).");
+                MessageBox.Show("All fields must be filled.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(surname) || surname.Length > maxLength)
+            // Optional: add additional validation (e.g. min length, patterns)
+            if (username.Length < 4)
             {
-                MessageBox.Show("Please enter your Surname (max 25 characters).");
+                MessageBox.Show("Username must be at least 4 characters long.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(username) || username.Length > maxLength)
+            if (password.Length < 6)
             {
-                MessageBox.Show("Please enter your Username (max 25 characters).");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(password) || password.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Password (max 25 characters).");
-                return false;
-            }
-
-            bool hasNumber = password.Any(char.IsDigit);
-            bool hasSpecialChar = password.Any(ch => !char.IsLetterOrDigit(ch));
-
-            if (!hasNumber || !hasSpecialChar)
-            {
-                MessageBox.Show("Password must contain at least one number and one special character.");
+                MessageBox.Show("Password must be at least 6 characters long.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -51,17 +36,9 @@ namespace Report_Tracking_System___Practice_1
 
         public bool ValidateLoginInputs(string username, string password)
         {
-            int maxLength = 25;
-
-            if (string.IsNullOrWhiteSpace(username) || username.Length > maxLength)
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
-                MessageBox.Show("Please enter your Username (max 25 characters).");
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(password) || password.Length > maxLength)
-            {
-                MessageBox.Show("Please enter your Password (max 25 characters).");
+                MessageBox.Show("Please enter both username and password.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
 
@@ -69,3 +46,4 @@ namespace Report_Tracking_System___Practice_1
         }
     }
 }
+

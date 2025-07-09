@@ -10,90 +10,99 @@ namespace Report_Tracking_System___Practice_1
 {
     public class AddToDB
     {
-        private string _connectionString;
+        private string connectionString;
 
-        public AddToDB(string connectionString)
+        public AddToDB(string connStr)
         {
-            _connectionString = connectionString;
-        }
-
-        public bool UsernameExists(string username)
-        {
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            {
-                con.Open();
-                using (SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM Users WHERE Username = @Username", con))
-                {
-                    checkCmd.Parameters.AddWithValue("@Username", username);
-                    int userCount = (int)checkCmd.ExecuteScalar();
-                    return userCount > 0;
-                }
-            }
+            connectionString = connStr;
         }
 
         public bool SaveUser(string name, string surname, string username, string hashedPassword)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                con.Open();
-                using (SqlCommand insertCmd = new SqlCommand(
-                    "INSERT INTO Users (Name, Surname, Username, Password) VALUES (@Name, @Surname, @Username, @Password)", con))
+                using (SqlConnection con = new SqlConnection(connectionString))
                 {
-                    insertCmd.Parameters.AddWithValue("@Name", name);
-                    insertCmd.Parameters.AddWithValue("@Surname", surname);
-                    insertCmd.Parameters.AddWithValue("@Username", username);
-                    insertCmd.Parameters.AddWithValue("@Password", hashedPassword);
+                    string query = "INSERT INTO Users (Name, Surname, Username, Password) VALUES (@Name, @Surname, @Username, @Password)";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Name", name);
+                    cmd.Parameters.AddWithValue("@Surname", surname);
+                    cmd.Parameters.AddWithValue("@Username", username);
+                    cmd.Parameters.AddWithValue("@Password", hashedPassword);
 
-                    int rowsAffected = insertCmd.ExecuteNonQuery();
+                    con.Open();
+                    int rowsAffected = cmd.ExecuteNonQuery();
                     return rowsAffected > 0;
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log or show error
+                System.Windows.Forms.MessageBox.Show("Error saving user: " + ex.Message);
+                return false;
+            }
+        }
+
+        public bool UsernameExists(string username)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @Username";
+                    SqlCommand cmd = new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@Username", username);
+
+                    con.Open();
+                    int count = (int)cmd.ExecuteScalar();
+                    return count > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Error checking username: " + ex.Message);
+                return false;
             }
         }
 
         public string GetStoredHashedPassword(string username)
         {
-            using (SqlConnection con = new SqlConnection(_connectionString))
+            try
             {
-                con.Open();
-                string query = "SELECT Password FROM Users WHERE Username = @Username";
-                using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlConnection con = new SqlConnection(connectionString))
                 {
+                    string query = "SELECT Password FROM Users WHERE Username = @Username";
+                    SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@Username", username);
-                    object result = cmd.ExecuteScalar();
+
+                    con.Open();
+                    var result = cmd.ExecuteScalar();
                     return result?.ToString();
                 }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show("Error retrieving password: " + ex.Message);
+                return null;
             }
         }
 
         public string HashPassword(string password)
         {
-            using (SHA256 sha256 = SHA256.Create())
+            using (SHA256 sha = SHA256.Create())
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(password);
-                byte[] hashBytes = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hashBytes);
+                byte[] bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in bytes)
+                    sb.Append(b.ToString("x2"));
+                return sb.ToString();
             }
         }
 
         public string GenerateRepoprtID()
         {
-            string nextId = "RPT001";
-
-            using (SqlConnection con = new SqlConnection(_connectionString))
-            using (SqlCommand cmd = new SqlCommand("SELECT MAX(UserID) FROM Users WHERE UserID LIKE 'RPT%'", con))
-            {
-                con.Open();
-                var result = cmd.ExecuteScalar();
-                if (result != DBNull.Value && result != null)
-                {
-                    string lastId = (string)result;
-                    int number = int.Parse(lastId.Substring(3)) + 1;
-                    nextId = "RPT" + number.ToString("D3");
-                }
-            }
-
-            return nextId;
+            // Sample implementation if you want to generate an ID
+            return "RPT" + DateTime.Now.Ticks.ToString().Substring(10); // e.g., RPT123456
         }
-        // auto generate the report id 
     }
 }
