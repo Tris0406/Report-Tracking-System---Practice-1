@@ -18,7 +18,7 @@ namespace Report_Tracking_System___Practice_1
     public partial class Menu : Form
     {
         public bool bLoggedin = false;
-        private bool tabsInitiallyDisabled = false;
+       // private bool tabsInitiallyDisabled = false;
         private string sConnectionString = @"Server=localhost;Database=Report_Tracker_System_Practice_1;Trusted_Connection=True;";
 
         private AddToDB db;
